@@ -71,6 +71,7 @@ The overview slide uses a balanced two-column composition. Each headline phrase 
 - Initial content may fade or rise into view over approximately `0.7–0.8s`.
 - Event slides, the header label, and the progress line transition together over `1.1s` using `cubic-bezier(.45, 0, .25, 1)`.
 - The slider accepts one navigation step at a time and uses a `1200ms` wheel lock to prevent accidental multi-slide jumps.
+- On touch devices, a deliberate vertical swipe within the event panel moves exactly one slide. The first and last slides release outward swipes to normal page scrolling so the panel never traps the page.
 - The slider must not trap normal page scrolling at its first or last slide.
 - All four navigation squares are buttons and must remain usable without wheel input.
 - Motion should feel smooth and deliberate. Do not add bouncing, elastic easing, parallax, or continuous decorative movement beyond the established blinking caret.

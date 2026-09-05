@@ -397,6 +397,52 @@ document.addEventListener('DOMContentLoaded', async function() {
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Community for AI and Software">
 <meta name="twitter:description" content="Campus Compile · Klagenfurt">
+<style>
+  @media (max-width: 640px) {
+    .event-panel-header-row {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px !important;
+      padding: 10px 12px !important;
+    }
+    .event-panel-identity {
+      display: flex !important;
+      gap: 10px !important;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .event-panel-name {
+      display: block;
+      flex: none;
+      white-space: nowrap !important;
+    }
+    .event-panel-meta {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap !important;
+    }
+    .event-panel-status {
+      justify-self: start;
+      min-width: 0;
+    }
+    .event-panel-label {
+      min-width: 0;
+      padding: 0 9px !important;
+    }
+    .event-panel-label > div > div {
+      font-size: 9px !important;
+      letter-spacing: 0.14em !important;
+    }
+    .event-panel-counter {
+      padding: 0 9px !important;
+      font-size: 9px !important;
+      letter-spacing: 0.1em !important;
+    }
+  }
+</style>
 </head>`
       );
 
@@ -416,6 +462,35 @@ document.addEventListener('DOMContentLoaded', async function() {
       source = source.replace(
         '<div style="position:relative;width:100%;max-width:1180px;border:1px solid #111110;background:#FFFFFF;display:flex;flex-direction:column;overflow:hidden">',
         '<div ref="{{ boxRef }}" style="position:relative;width:100%;max-width:1180px;border:1px solid #111110;background:#FFFFFF;display:flex;flex-direction:column;overflow:hidden">'
+      );
+
+      source = source.replace(
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,2.4vw,30px)">',
+        '<div class="event-panel-header-row" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px clamp(16px,2.4vw,30px)">'
+      );
+      source = source.replace(
+        '<div style="display:flex;align-items:baseline;gap:16px;min-width:0">',
+        '<div class="event-panel-identity" style="display:flex;align-items:baseline;gap:16px;min-width:0">'
+      );
+      source = source.replace(
+        '<div style="font-size:15px;font-weight:500;letter-spacing:0.04em;white-space:nowrap">AAU&nbsp;HACKATHON</div>',
+        '<div class="event-panel-name" style="font-size:15px;font-weight:500;letter-spacing:0.04em;white-space:nowrap">AAU&nbsp;HACKATHON</div>'
+      );
+      source = source.replace(
+        '<div style="font-family:\'JetBrains Mono\', monospace;font-size:10px;letter-spacing:0.14em;color:#6E6C64;white-space:nowrap">{{ eventDates }} · {{ venue }}</div>',
+        '<div class="event-panel-meta" style="font-family:\'JetBrains Mono\', monospace;font-size:10px;letter-spacing:0.14em;color:#6E6C64;white-space:nowrap">{{ eventDates }} · {{ venue }}</div>'
+      );
+      source = source.replace(
+        '<div style="display:flex;align-items:stretch;gap:0;flex:none">',
+        '<div class="event-panel-status" style="display:flex;align-items:stretch;gap:0;flex:none">'
+      );
+      source = source.replace(
+        '<div style="height:34px;overflow:hidden;background:#111110;padding:0 16px;display:block">',
+        '<div class="event-panel-label" style="height:34px;overflow:hidden;background:#111110;padding:0 16px;display:block">'
+      );
+      source = source.replace(
+        '<div style="height:34px;background:#E5322B;padding:0 14px;display:flex;align-items:center;font-family:\'JetBrains Mono\', monospace;font-size:11px;letter-spacing:0.16em;color:#F8F6F0;white-space:nowrap">{{ panelNo }}</div>',
+        '<div class="event-panel-counter" style="height:34px;background:#E5322B;padding:0 14px;display:flex;align-items:center;font-family:\'JetBrains Mono\', monospace;font-size:11px;letter-spacing:0.16em;color:#F8F6F0;white-space:nowrap">{{ panelNo }}</div>'
       );
 
       source = source.replace(
@@ -463,7 +538,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       source = source.replace(
         "    this.onScroll = this.onScroll.bind(this);",
-        "    this.goToPanel = this.goToPanel.bind(this);\n    this.updatePanel = this.updatePanel.bind(this);\n    this.onWheel = this.onWheel.bind(this);"
+        "    this.goToPanel = this.goToPanel.bind(this);\n    this.updatePanel = this.updatePanel.bind(this);\n    this.onWheel = this.onWheel.bind(this);\n    this.onTouchStart = this.onTouchStart.bind(this);\n    this.onTouchMove = this.onTouchMove.bind(this);\n    this.onTouchEnd = this.onTouchEnd.bind(this);"
       );
 
       source = source.replace(
@@ -478,13 +553,25 @@ document.addEventListener('DOMContentLoaded', async function() {
     };
     loop();
     this.wheelEl = this.boxRef.current;
-    if (this.wheelEl) this.wheelEl.addEventListener("wheel", this.onWheel, { passive: false });
+    if (this.wheelEl) {
+      this.wheelEl.addEventListener("wheel", this.onWheel, { passive: false });
+      this.wheelEl.addEventListener("touchstart", this.onTouchStart, { passive: true });
+      this.wheelEl.addEventListener("touchmove", this.onTouchMove, { passive: false });
+      this.wheelEl.addEventListener("touchend", this.onTouchEnd, { passive: true });
+      this.wheelEl.addEventListener("touchcancel", this.onTouchEnd, { passive: true });
+    }
   }
 
   componentWillUnmount() {
     this.alive = false;
     cancelAnimationFrame(this.raf);
-    if (this.wheelEl) this.wheelEl.removeEventListener("wheel", this.onWheel);
+    if (this.wheelEl) {
+      this.wheelEl.removeEventListener("wheel", this.onWheel);
+      this.wheelEl.removeEventListener("touchstart", this.onTouchStart);
+      this.wheelEl.removeEventListener("touchmove", this.onTouchMove);
+      this.wheelEl.removeEventListener("touchend", this.onTouchEnd);
+      this.wheelEl.removeEventListener("touchcancel", this.onTouchEnd);
+    }
   }
 
   goToPanel(nextIdx) {
@@ -512,6 +599,34 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (recentlyChanged) return;
     this.lastWheelAt = now;
     this.goToPanel(this.state.idx + direction);
+  }
+
+  onTouchStart(event) {
+    if (event.touches.length !== 1) return;
+    this.touchStartY = event.touches[0].clientY;
+    this.touchHandled = false;
+  }
+
+  onTouchMove(event) {
+    if (this.touchStartY == null || event.touches.length !== 1) return;
+    const deltaY = this.touchStartY - event.touches[0].clientY;
+    if (Math.abs(deltaY) < 12) return;
+
+    const direction = deltaY > 0 ? 1 : -1;
+    const atFirstSlide = this.state.idx === 0;
+    const atLastSlide = this.state.idx === PANELS.length - 1;
+    const leavingSlider = (direction < 0 && atFirstSlide) || (direction > 0 && atLastSlide);
+    if (leavingSlider) return;
+
+    event.preventDefault();
+    if (this.touchHandled || Math.abs(deltaY) < 48) return;
+    this.touchHandled = true;
+    this.goToPanel(this.state.idx + direction);
+  }
+
+  onTouchEnd() {
+    this.touchStartY = null;
+    this.touchHandled = false;
   }
 
   updatePanel() {
