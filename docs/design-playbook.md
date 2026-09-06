@@ -73,11 +73,11 @@ The overview slide uses a balanced two-column composition. Each headline phrase 
 - The Join form uses the established square border, ink button, red validation accent, Jost field text, and JetBrains Mono labels.
 - Consent checkboxes are unchecked by default and use the red accent only after an explicit selection.
 - Async forms preserve entered values across retryable errors and use distinct form, loading, success, field-error, and service-error states.
-- Service-error panels provide one primary retry action, one return action, and a request identifier when the server supplies one.
+- Service-error panels provide one primary Back action that returns to the form with entered values preserved, and a request identifier when the server supplies one.
 - Form errors are connected to their fields, announced through live regions, and followed by programmatic focus on the problem or recovery action.
 - Show ordinary field errors before any Turnstile error so one submission does not repeat two recovery instructions for the same failed attempt.
 - Treat a failed Turnstile bootstrap or server configuration check as a service error, not as an incomplete-security-check field error; retain the request identifier when the endpoint provides one.
-- The Join form keeps its default state to name, email, consent, and the submit action. The red, underlined word “agree” inside the consent copy toggles the inline privacy notice; the disclosure remains keyboard accessible.
+- The Join form keeps its default state to name, email, optional organization, consent, and the submit action. The red, underlined word “agree” inside the consent copy toggles the inline privacy notice; the disclosure remains keyboard accessible.
 
 ## Motion
 
@@ -139,14 +139,14 @@ New event blocks should reuse this four-slide structure unless the event genuine
 
 ## Join section and external services
 
-The Join section is for event email updates. It asks for a name and email address; it does not ask for a study program.
+The Join section is for event email updates. It asks for a name, email address, and optional organization; it does not ask for a study program.
 
 The current form submits to the same-origin Cloudflare Pages Function, which validates the request and creates or updates a contact in the configured Brevo list. It must fail closed when its server configuration is incomplete and must not claim success until Brevo accepts the request.
 
 For this integration:
 
 - Explain that subscribers receive occasional messages about hackathons, workshops, and events in Klagenfurt.
-- Ask only for name, email, and explicit, unchecked consent; keep the concise privacy notice behind the inline “agree” disclosure and state that consent can be withdrawn.
+- Ask for name, email, optional organization, and explicit, unchecked consent; keep the concise privacy notice behind the inline “agree” disclosure and state that consent can be withdrawn.
 - Keep all provider access server-side through the Pages Function.
 - Never expose an API key in the page source.
 - Update the success message only after a submission has been accepted by the service.

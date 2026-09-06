@@ -756,12 +756,18 @@ document.addEventListener('DOMContentLoaded', async function() {
               <sc-if value="{{ hasEmailError }}" hint-placeholder-val="{{ false }}"><span id="join-email-error" class="cc-field-error" role="alert">{{ emailError }}</span></sc-if>
             </label>
 
+            <label for="join-organization" style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.18em;color:#6E6C64">ORGANIZATION (OPTIONAL)</span>
+              <input ref="{{ organizationRef }}" id="join-organization" name="organization" type="text" value="{{ formOrganization }}" sc-camel-on-change="{{ setOrganization }}" autocomplete="organization" maxlength="100" aria-invalid="{{ hasOrganizationError }}" aria-describedby="join-organization-error" placeholder="University, company, or community" class="{{ organizationFieldClass }}" style="background:transparent;border:0;border-bottom:1px solid #DDD9CE;font-size:18px;font-weight:300;padding:8px 0;outline:none;color:#111110" style-focus="border-bottom-color:#E5322B">
+              <sc-if value="{{ hasOrganizationError }}" hint-placeholder-val="{{ false }}"><span id="join-organization-error" class="cc-field-error" role="alert">{{ organizationError }}</span></sc-if>
+            </label>
+
             <div class="{{ consentFieldClass }}" style="display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px 12px;align-items:start;border:1px solid #DDD9CE;padding:13px 14px">
               <label for="join-consent" class="cc-visually-hidden">Consent to receive Campus Compile event announcements by email</label>
               <input ref="{{ consentRef }}" id="join-consent" name="consent" type="checkbox" checked="{{ formConsent }}" sc-camel-on-change="{{ setConsent }}" aria-invalid="{{ hasConsentError }}" aria-describedby="join-consent-error" style="appearance:none;width:16px;height:16px;margin:2px 0 0;border:1px solid #111110;background:{{ consentBackground }};box-shadow:inset 0 0 0 3px #F8F6F0;cursor:pointer">
               <span style="font-size:14px;font-weight:300;line-height:1.55;color:#33322D">I <button type="button" sc-camel-on-click="{{ togglePrivacyNotice }}" aria-expanded="{{ privacyNoticeOpen }}" aria-controls="join-privacy-notice" style="appearance:none;border:0;background:transparent;color:#E5322B;font:inherit;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px">agree</button> to receive Campus Compile event announcements by email.</span>
               <sc-if value="{{ hasConsentError }}" hint-placeholder-val="{{ false }}"><span id="join-consent-error" class="cc-field-error" role="alert" style="grid-column:2">{{ consentError }}</span></sc-if>
-              <sc-if value="{{ privacyNoticeOpen }}" hint-placeholder-val="{{ false }}"><p id="join-privacy-notice" style="grid-column:2;font-size:12px;font-weight:300;line-height:1.6;color:#6E6C64;margin:0;text-wrap:pretty">Campus Compile stores your name and email in Brevo and uses them to send event announcements. We keep this data until you unsubscribe. You can withdraw your consent at any time.</p></sc-if>
+              <sc-if value="{{ privacyNoticeOpen }}" hint-placeholder-val="{{ false }}"><p id="join-privacy-notice" style="grid-column:2;font-size:12px;font-weight:300;line-height:1.6;color:#6E6C64;margin:0;text-wrap:pretty">Campus Compile stores your name, email, and organization (if provided) in Brevo and uses them to send event announcements. We keep this data until you unsubscribe. You can withdraw your consent at any time.</p></sc-if>
             </div>
 
             <div class="cc-visually-hidden" aria-hidden="true">
@@ -798,8 +804,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             <div style="font-size:16px;font-weight:300;line-height:1.7;color:#33322D;max-width:42ch">{{ subscriptionErrorMessage }}</div>
             <sc-if value="{{ hasRequestId }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono', monospace;font-size:10px;line-height:1.6;letter-spacing:0.06em;color:#6E6C64;margin-top:16px">REQUEST ID · {{ subscriptionRequestId }}</div></sc-if>
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px">
-              <button ref="{{ retryRef }}" type="button" sc-camel-on-click="{{ retrySubscription }}" style="appearance:none;border:0;background:#111110;color:#F8F6F0;font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;padding:14px 18px;cursor:pointer" style-hover="background:#E5322B">&gt; TRY AGAIN</button>
-              <button type="button" sc-camel-on-click="{{ returnToSite }}" style="appearance:none;background:transparent;border:1px solid #DDD9CE;font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;padding:14px 18px;cursor:pointer;color:#111110" style-hover="border-color:#111110">&gt; BACK TO SITE</button>
+              <button ref="{{ retryRef }}" type="button" sc-camel-on-click="{{ retrySubscription }}" style="appearance:none;border:0;background:#111110;color:#F8F6F0;font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;padding:14px 18px;cursor:pointer" style-hover="background:#E5322B">&gt; BACK</button>
             </div>
           </div>
         </sc-if>
@@ -812,7 +817,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       source = source.replace(
         'this.state = { idx: 0, day: null, name: "", email: "", applicationNotice: false, submitted: false };',
-        'this.state = { idx: 0, day: null, name: "", email: "", consent: false, website: "", privacyNoticeOpen: false, applicationNotice: false, subscriptionStatus: "form", fieldErrors: {}, formMessage: "", requestId: "", turnstileToken: "", turnstileSiteKey: "" };'
+        'this.state = { idx: 0, day: null, name: "", email: "", organization: "", consent: false, website: "", privacyNoticeOpen: false, applicationNotice: false, subscriptionStatus: "form", fieldErrors: {}, formMessage: "", requestId: "", turnstileToken: "", turnstileSiteKey: "" };'
       );
 
       source = source.replace(
@@ -820,6 +825,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         `    this.labelRef = React.createRef();
     this.nameRef = React.createRef();
     this.emailRef = React.createRef();
+    this.organizationRef = React.createRef();
     this.consentRef = React.createRef();
     this.turnstileRef = React.createRef();
     this.retryRef = React.createRef();
@@ -942,6 +948,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   focusFirstError(fieldErrors) {
     if (fieldErrors.name) return this.focusRef(this.nameRef);
     if (fieldErrors.email) return this.focusRef(this.emailRef);
+    if (fieldErrors.organization) return this.focusRef(this.organizationRef);
     if (fieldErrors.consent) return this.focusRef(this.consentRef);
     if (fieldErrors.turnstile && this.turnstileRef.current) {
       const frame = this.turnstileRef.current.querySelector("iframe");
@@ -956,9 +963,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (!name) errors.name = "Enter your name.";
     else if (name.length > 100) errors.name = "Keep your name to 100 characters or fewer.";
     if (!email || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) errors.email = "Check the email address and try again.";
+    const organization = (this.state.organization || "").normalize("NFKC").replace(/\\s+/g, " ").trim();
+    if (organization.length > 100) errors.organization = "Keep your organization to 100 characters or fewer.";
     if (!this.state.consent) errors.consent = "Consent is required to subscribe to email announcements.";
     if (!Object.keys(errors).length && !this.state.turnstileToken) errors.turnstile = "Complete the security check and try again.";
-    return { errors, name, email };
+    return { errors, name, email, organization };
   }
 
   async submitSubscription(event) {
@@ -980,6 +989,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         body: JSON.stringify({
           name: validation.name,
           email: validation.email,
+          organization: validation.organization,
           consent: this.state.consent === true,
           website: this.state.website || "",
           turnstileToken: this.state.turnstileToken
@@ -997,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       if (response.status === 422 && data.fieldErrors) {
         const fieldErrors = { ...data.fieldErrors };
-        if (fieldErrors.name || fieldErrors.email || fieldErrors.consent) delete fieldErrors.turnstile;
+        if (fieldErrors.name || fieldErrors.email || fieldErrors.organization || fieldErrors.consent) delete fieldErrors.turnstile;
         this.setState({
           subscriptionStatus: "form",
           fieldErrors,
@@ -1057,16 +1067,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         `      formName: this.state.name,
       formEmailRaw: this.state.email,
       formEmail: this.state.email || "your inbox",
+      formOrganization: this.state.organization,
       formConsent: !!this.state.consent,
       formWebsite: this.state.website,
       nameRef: this.nameRef,
       emailRef: this.emailRef,
+      organizationRef: this.organizationRef,
       consentRef: this.consentRef,
       turnstileRef: this.turnstileRef,
       retryRef: this.retryRef,
       successRef: this.successRef,
       setName: e => this.setState({ name: e.target.value, fieldErrors: { ...this.state.fieldErrors, name: "" }, formMessage: "" }),
       setEmail: e => this.setState({ email: e.target.value, fieldErrors: { ...this.state.fieldErrors, email: "" }, formMessage: "" }),
+      setOrganization: e => this.setState({ organization: e.target.value, fieldErrors: { ...this.state.fieldErrors, organization: "" }, formMessage: "" }),
       setConsent: e => this.setState({ consent: e.target.checked, fieldErrors: { ...this.state.fieldErrors, consent: "" }, formMessage: "" }),
       setWebsite: e => this.setState({ website: e.target.value }),
       togglePrivacyNotice: () => this.setState(state => ({ privacyNoticeOpen: !state.privacyNoticeOpen })),
@@ -1081,6 +1094,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       submitOpacity: this.state.subscriptionStatus === "loading" ? "0.62" : "1",
       nameError: this.state.fieldErrors.name || "",
       emailError: this.state.fieldErrors.email || "",
+      organizationError: this.state.fieldErrors.organization || "",
+      hasOrganizationError: !!this.state.fieldErrors.organization,
+      organizationFieldClass: this.state.fieldErrors.organization ? "cc-field-invalid" : "",
       consentError: this.state.fieldErrors.consent || "",
       turnstileError: this.state.fieldErrors.turnstile || "",
       hasNameError: !!this.state.fieldErrors.name,

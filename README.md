@@ -58,7 +58,7 @@ Run the dependency-free endpoint contract tests before deployment:
 node --test --test-isolation=none
 ```
 
-The Brevo contact attribute `FIRSTNAME` must exist as a text attribute in the Brevo account. Turnstile must allow the hostname configured by `ALLOWED_ORIGIN` and use the `newsletter_subscribe` action.
+The Brevo contact attributes `FIRSTNAME` and `ORGANIZATION` must exist as text attributes in the Brevo account. The optional organization field is normalized and sent as `ORGANIZATION` when nonempty; leaving it blank preserves any existing organization on a repeated subscription. Turnstile must allow the hostname configured by `ALLOWED_ORIGIN` and use the `newsletter_subscribe` action.
 
 The repository does not currently contain a full privacy policy. The form therefore includes a concise privacy notice without presenting it as a substitute for that policy; add a policy link when a policy page is published.
 

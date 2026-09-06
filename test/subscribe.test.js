@@ -52,6 +52,42 @@ test("rejects missing consent", () => {
   assert.match(result.fieldErrors.consent, /required/i);
 });
 
+test("organization is optional, normalized, and validated when supplied", () => {
+  for (const organization of [undefined, "", "   "]) {
+    const result = __test.validatePayload(validPayload({ organization }));
+    assert.equal(result.organization, "");
+    assert.deepEqual(result.fieldErrors, {});
+  }
+  assert.equal(__test.validatePayload(validPayload({ organization: "  Campus   Club  " })).organization, "Campus Club");
+  for (const organization of [123, null, {}, "x".repeat(101), "Bad\u0000Name"]) {
+    assert.ok(__test.validatePayload(validPayload({ organization })).fieldErrors.organization);
+  }
+});
+
+test("sends optional organization to Brevo and omits blank values on resubmission", async () => {
+  const originalFetch = globalThis.fetch;
+  const attributes = [];
+  globalThis.fetch = async (url, init) => {
+    if (String(url).includes("siteverify")) {
+      return Response.json({ success: true, action: "newsletter_subscribe", hostname: "campuscompile.eu" });
+    }
+    attributes.push(JSON.parse(init.body).attributes);
+    return new Response(null, { status: 204 });
+  };
+  try {
+    for (const organization of ["  Campus   Club  ", "", undefined]) {
+      assert.equal((await onRequest({ request: makeRequest(validPayload({ organization })), env: makeEnv() })).status, 200);
+    }
+    assert.deepEqual(attributes, [
+      { FIRSTNAME: "Ada Lovelace", ORGANIZATION: "Campus Club" },
+      { FIRSTNAME: "Ada Lovelace" },
+      { FIRSTNAME: "Ada Lovelace" },
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("rejects invalid email and overlong or empty names", () => {
   assert.ok(__test.validatePayload(validPayload({ email: "not-an-email" })).fieldErrors.email);
   assert.ok(__test.validatePayload(validPayload({ name: "" })).fieldErrors.name);

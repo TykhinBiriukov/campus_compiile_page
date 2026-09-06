@@ -1,5 +1,6 @@
 const MAX_BODY_BYTES = 8 * 1024;
 const MAX_NAME_LENGTH = 100;
+const MAX_ORGANIZATION_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 254;
 const TURNSTILE_TOKEN_MAX_LENGTH = 2048;
 const BREVO_CONTACTS_URL = "https://api.brevo.com/v3/contacts";
@@ -145,6 +146,7 @@ function validatePayload(payload) {
 
   const name = typeof payload.name === "string" ? normalizeName(payload.name) : "";
   const email = typeof payload.email === "string" ? normalizeEmail(payload.email) : "";
+  const organization = typeof payload.organization === "string" ? normalizeName(payload.organization) : "";
   const consent = payload.consent === true;
   const website = typeof payload.website === "string" ? payload.website.trim() : "";
   const turnstileToken = typeof payload.turnstileToken === "string" ? payload.turnstileToken.trim() : "";
@@ -161,6 +163,14 @@ function validatePayload(payload) {
     fieldErrors.email = "Check the email address and try again.";
   }
 
+  if (payload.organization !== undefined && typeof payload.organization !== "string") {
+    fieldErrors.organization = "Enter an organization name or leave this field blank.";
+  } else if (organization.length > MAX_ORGANIZATION_LENGTH) {
+    fieldErrors.organization = `Keep your organization to ${MAX_ORGANIZATION_LENGTH} characters or fewer.`;
+  } else if (/[\u0000-\u001F\u007F]/u.test(organization)) {
+    fieldErrors.organization = "Your organization contains unsupported characters.";
+  }
+
   if (!consent) {
     fieldErrors.consent = "Consent is required to subscribe to email announcements.";
   }
@@ -169,7 +179,7 @@ function validatePayload(payload) {
     fieldErrors.turnstile = "Complete the security check and try again.";
   }
 
-  return { name, email, consent, website, turnstileToken, fieldErrors };
+  return { name, email, organization, consent, website, turnstileToken, fieldErrors };
 }
 
 function validateEnvironment(env) {
@@ -237,7 +247,7 @@ async function verifyTurnstile({ token, request, env, requestId }) {
   );
 }
 
-async function upsertBrevoContact({ name, email, listId, apiKey }) {
+async function upsertBrevoContact({ name, email, organization, listId, apiKey }) {
   return fetchWithTimeout(
     BREVO_CONTACTS_URL,
     {
@@ -249,7 +259,7 @@ async function upsertBrevoContact({ name, email, listId, apiKey }) {
       },
       body: JSON.stringify({
         email,
-        attributes: { FIRSTNAME: name },
+        attributes: { FIRSTNAME: name, ...(organization ? { ORGANIZATION: organization } : {}) },
         listIds: [listId],
         emailBlacklisted: false,
         updateEnabled: true,
@@ -410,6 +420,7 @@ async function handlePost(request, env, requestId) {
     brevoResponse = await upsertBrevoContact({
       name: validated.name,
       email: validated.email,
+      organization: validated.organization,
       listId: config.listId,
       apiKey: env.BREVO_API_KEY,
     });
