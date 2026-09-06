@@ -249,7 +249,7 @@ async function upsertBrevoContact({ name, email, listId, apiKey }) {
       },
       body: JSON.stringify({
         email,
-        attributes: { FNAME: name },
+        attributes: { FIRSTNAME: name },
         listIds: [listId],
         emailBlacklisted: false,
         updateEnabled: true,

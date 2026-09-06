@@ -182,7 +182,7 @@ test("creates or updates a Brevo contact without exposing the API key", async ()
     assert.equal(calls.length, 2);
     const brevoBody = JSON.parse(calls[1].init.body);
     assert.equal(brevoBody.email, "ada@example.com");
-    assert.equal(brevoBody.attributes.FNAME, "Ada Lovelace");
+    assert.equal(brevoBody.attributes.FIRSTNAME, "Ada Lovelace");
     assert.deepEqual(brevoBody.listIds, [42]);
     assert.equal(brevoBody.updateEnabled, true);
     assert.equal(calls[1].init.headers["api-key"], "test-api-key");
