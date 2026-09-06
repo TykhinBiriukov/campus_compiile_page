@@ -42,15 +42,15 @@ The static local preview does not execute the Cloudflare Pages Function. Test th
 
 The production site is deployed by [the GitHub Actions workflow](.github/workflows/deploy.yaml). A push to `main`, or a manual workflow run, invokes `cloudflare/wrangler-action@v4` with Wrangler 4 and deploys the repository root to the `campuscompile` Pages project. The action installs Wrangler inside the GitHub runner; no local Wrangler or pnpm installation is required.
 
-`wrangler.jsonc` is the source of truth for Cloudflare Pages runtime configuration. Wrangler reads it during the GitHub Actions deployment to provide the public environment values and the `SUBSCRIBE_RATE_LIMITER` binding used by the server function. Keep the encrypted `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` values in the Cloudflare Pages dashboard, and keep `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub Actions secrets.
+`wrangler.jsonc` is the source of truth for the non-secret Cloudflare Pages runtime configuration. Wrangler reads it during the GitHub Actions deployment to provide the public environment values used by the server function. Keep the encrypted `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` values in the Cloudflare Pages dashboard, and keep `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub Actions secrets. Pages configuration does not support the Workers `secrets` declaration or Rate Limiting binding, so neither belongs in this file.
 
 ## Newsletter integration
 
-The Join form posts JSON to the same-origin Cloudflare Pages Function at `/api/subscribe`. The Function validates and normalizes the request, verifies Turnstile, applies a Cloudflare rate limit, and creates or updates the Brevo contact with `updateEnabled: true`.
+The Join form posts JSON to the same-origin Cloudflare Pages Function at `/api/subscribe`. The Function validates and normalizes the request, verifies Turnstile, and creates or updates the Brevo contact with `updateEnabled: true`. Protect production traffic with a Cloudflare WAF rate-limiting rule matching `POST /api/subscribe`; the server also honors a `SUBSCRIBE_RATE_LIMITER` binding if the project is migrated to a runtime that supports it.
 
 After Brevo accepts the contact, the page replaces the form with its in-page success panel. The Function does not send a welcome or confirmation email itself; configure that message as a Brevo automation if one is required.
 
-Before deployment, replace the non-secret placeholders in `wrangler.jsonc` with a numeric Brevo list ID, the exact public origin, and the public Turnstile site key. Configure `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` as encrypted Cloudflare Pages secrets. Production and preview use separate origins, Brevo lists, Turnstile widgets, secrets, and rate-limit namespaces; configure both environments before enabling preview subscriptions. A placeholder or missing binding makes the endpoint fail closed with a user-safe “temporarily unavailable” response.
+Before deployment, replace the non-secret placeholders in `wrangler.jsonc` with a numeric Brevo list ID, the exact public origin, and the public Turnstile site key. Configure `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` as encrypted Cloudflare Pages secrets. Production and preview use separate origins, Brevo lists, Turnstile widgets, and secrets; configure both environments before enabling preview subscriptions. A placeholder or missing required value makes the endpoint fail closed with a user-safe “temporarily unavailable” response.
 
 Run the dependency-free endpoint contract tests before deployment:
 
@@ -64,7 +64,8 @@ The repository does not currently contain a full privacy policy. The form theref
 
 ### Before public launch
 
-- Replace every placeholder in `wrangler.jsonc`, configure both encrypted secrets, and confirm that production and preview use the intended origins, Brevo lists, Turnstile widgets, and rate-limit namespaces.
+- Replace every placeholder in `wrangler.jsonc`, configure both encrypted secrets, and confirm that production and preview use the intended origins, Brevo lists, and Turnstile widgets.
+- Create a zone-level Cloudflare WAF rate-limiting rule for `POST /api/subscribe` before public launch. A starting point is four requests per minute per source IP; tune it from observed traffic.
 - Use a disposable address to verify a new contact and a repeated subscription in Brevo. Confirm that the second request updates the existing contact rather than creating a duplicate and that the name and email are normalized.
 - Verify rejection of missing consent, an invalid email, an oversized request, a foreign origin, and unsupported request methods.
 - Exercise the safe failure responses for missing configuration, Turnstile failure, rate limiting, and Brevo or network unavailability.

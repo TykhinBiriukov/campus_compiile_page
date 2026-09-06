@@ -12,7 +12,6 @@ function makeEnv(overrides = {}) {
     BREVO_LIST_ID: "42",
     TURNSTILE_SECRET_KEY: "test-turnstile-secret",
     TURNSTILE_SITE_KEY: "test-turnstile-site-key",
-    SUBSCRIBE_RATE_LIMITER: { limit: async () => ({ success: true }) },
     ...overrides,
   };
 }
@@ -115,7 +114,7 @@ test("rejects missing server configuration safely", async () => {
   assert.doesNotMatch(JSON.stringify(result.body), /BREVO_API_KEY/);
 });
 
-test("returns 429 when the rate limiter blocks the request", async () => {
+test("returns 429 when an optional runtime rate limiter blocks the request", async () => {
   const result = await read(
     await onRequest({
       request: makeRequest(validPayload()),

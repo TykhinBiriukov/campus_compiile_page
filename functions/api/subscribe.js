@@ -175,7 +175,6 @@ function validatePayload(payload) {
 function validateEnvironment(env) {
   const listId = Number(env.BREVO_LIST_ID);
   const validListId = Number.isSafeInteger(listId) && listId > 0;
-  const validRateLimiter = env.SUBSCRIBE_RATE_LIMITER && typeof env.SUBSCRIBE_RATE_LIMITER.limit === "function";
 
   return {
     ok:
@@ -186,8 +185,7 @@ function validateEnvironment(env) {
       typeof env.TURNSTILE_SECRET_KEY === "string" &&
       env.TURNSTILE_SECRET_KEY.length > 0 &&
       typeof env.TURNSTILE_SITE_KEY === "string" &&
-      env.TURNSTILE_SITE_KEY.length > 0 &&
-      validRateLimiter,
+      env.TURNSTILE_SITE_KEY.length > 0,
     listId,
   };
 }
@@ -362,17 +360,19 @@ async function handlePost(request, env, requestId) {
     });
   }
 
-  const emailKey = await sha256(validated.email);
-  const rateLimit = await env.SUBSCRIBE_RATE_LIMITER.limit({ key: `email:${emailKey}` });
-  if (!rateLimit.success) {
-    return errorResponse({
-      code: "rate_limited",
-      message: "Too many attempts. Please wait a moment before trying again.",
-      requestId,
-      status: 429,
-      allowedOrigin,
-      headers: { "retry-after": "60" },
-    });
+  if (env.SUBSCRIBE_RATE_LIMITER && typeof env.SUBSCRIBE_RATE_LIMITER.limit === "function") {
+    const emailKey = await sha256(validated.email);
+    const rateLimit = await env.SUBSCRIBE_RATE_LIMITER.limit({ key: `email:${emailKey}` });
+    if (!rateLimit.success) {
+      return errorResponse({
+        code: "rate_limited",
+        message: "Too many attempts. Please wait a moment before trying again.",
+        requestId,
+        status: 429,
+        allowedOrigin,
+        headers: { "retry-after": "60" },
+      });
+    }
   }
 
   let turnstileValid = false;
