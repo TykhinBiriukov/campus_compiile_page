@@ -1,0 +1,12 @@
+{
+  "name": "campus-compile-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test --test-isolation=none",
+    "check:pages": "wrangler pages functions build functions --outdir .wrangler-check"
+  },
+  "devDependencies": {
+    "wrangler": "4.129.0"
+  }
+}

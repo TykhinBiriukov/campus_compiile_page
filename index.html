@@ -398,7 +398,60 @@ document.addEventListener('DOMContentLoaded', async function() {
 <meta name="twitter:title" content="Community for AI and Software">
 <meta name="twitter:description" content="Campus Compile · Klagenfurt">
 <style>
+  .cc-field-error {
+    margin-top: 7px;
+    color: #E5322B;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+  }
+  .cc-field-invalid {
+    border-color: #E5322B !important;
+  }
+  .cc-visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+  .cc-spinner {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-right: 9px;
+    border: 1px solid currentColor;
+    border-right-color: transparent;
+    vertical-align: -2px;
+    animation: ccSpin .7s linear infinite;
+  }
+  @keyframes ccSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: .01ms !important;
+    }
+  }
   @media (max-width: 640px) {
+    .site-nav {
+      gap: 12px !important;
+      padding: 0 14px !important;
+    }
+    .site-nav-links {
+      gap: 10px !important;
+      font-size: 10px !important;
+      letter-spacing: .08em !important;
+    }
+    .site-nav-links a[href="#join"] {
+      padding: 9px 12px !important;
+    }
     .event-panel-header-row {
       display: grid !important;
       grid-template-columns: minmax(0, 1fr);
@@ -447,8 +500,23 @@ document.addEventListener('DOMContentLoaded', async function() {
       );
 
       source = source.replace(
+        `<div style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.2em;color:#6E6C64;margin-bottom:40px">WHAT WE ARE</div>`,
+        `<h2 style="font-size:clamp(26px,3vw,40px);font-weight:400;margin:0 0 16px;letter-spacing:0.01em">What we are</h2>
+      <p style="font-size:16px;font-weight:300;line-height:1.7;color:#33322D;margin:0 0 40px;max-width:60ch;text-wrap:pretty">Our principles and the kind of community we want to build together.</p>`
+      );
+
+      source = source.replace(
         "Keep scrolling — the hackathon opens in place and pages through on its own before the site continues.",
         "Scroll to move through the hackathon one slide at a time,<br>or choose a slide with the squares on the right."
+      );
+
+      source = source.replace(
+        '<div style="position:sticky;top:0;z-index:30;background:rgba(248,246,240,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #111110;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 clamp(20px,4vw,64px);height:62px">',
+        '<div class="site-nav" style="position:sticky;top:0;z-index:30;background:rgba(248,246,240,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #111110;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 clamp(20px,4vw,64px);height:62px">'
+      );
+      source = source.replace(
+        '<div style="display:flex;align-items:center;gap:clamp(14px,2.2vw,30px);font-family:\'JetBrains Mono\', monospace;font-size:11px;letter-spacing:0.14em;color:#6E6C64">',
+        '<div class="site-nav-links" style="display:flex;align-items:center;gap:clamp(14px,2.2vw,30px);font-family:\'JetBrains Mono\', monospace;font-size:11px;letter-spacing:0.14em;color:#6E6C64">'
       );
 
       source = source.replace(
@@ -661,6 +729,352 @@ document.addEventListener('DOMContentLoaded', async function() {
       );
 
       source = source.replace(/hello@campuscompile\.at/g, "info@campuscompile.eu");
+
+      source = source.replace(
+        /  <section id="join"[\s\S]*?\n  <\/section>\n\n  <footer/,
+        `  <section id="join" style="padding:clamp(56px,7vw,100px) clamp(20px,4vw,64px)">
+    <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(24px,4vw,56px);align-items:start">
+      <div>
+        <h2 style="font-size:clamp(28px,3.4vw,48px);font-weight:400;margin:0 0 20px;letter-spacing:0.01em;text-wrap:pretty">Join the community.</h2>
+        <p style="font-size:17px;font-weight:300;line-height:1.7;color:#33322D;margin:0;max-width:46ch;text-wrap:pretty">Get emails about hackathons, workshops and upcoming events in Klagenfurt. Join the list to stay in the loop.</p>
+        <div style="font-family:'JetBrains Mono', monospace;font-size:11px;line-height:2.2;letter-spacing:0.06em;color:#6E6C64;margin-top:30px">
+          <div>{{ venue }}</div>
+          <div><span style="color:#E5322B">&gt;</span> info@campuscompile.eu</div>
+        </div>
+      </div>
+      <div style="border:1px solid #111110;padding:clamp(20px,2.4vw,30px)">
+        <sc-if value="{{ subscriptionFormVisible }}" hint-placeholder-val="{{ true }}">
+          <form sc-camel-on-submit="{{ submitSubscription }}" aria-busy="{{ submitting }}" novalidate="" style="display:flex;flex-direction:column;gap:18px">
+            <label for="join-name" style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.18em;color:#6E6C64">NAME</span>
+              <input ref="{{ nameRef }}" id="join-name" name="name" type="text" value="{{ formName }}" sc-camel-on-change="{{ setName }}" autocomplete="name" maxlength="100" aria-invalid="{{ hasNameError }}" aria-describedby="join-name-error" placeholder="John Doe" class="{{ nameFieldClass }}" style="background:transparent;border:0;border-bottom:1px solid #DDD9CE;font-size:18px;font-weight:300;padding:8px 0;outline:none;color:#111110" style-focus="border-bottom-color:#E5322B">
+              <sc-if value="{{ hasNameError }}" hint-placeholder-val="{{ false }}"><span id="join-name-error" class="cc-field-error" role="alert">{{ nameError }}</span></sc-if>
+            </label>
+            <label for="join-email" style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.18em;color:#6E6C64">EMAIL</span>
+              <input ref="{{ emailRef }}" id="join-email" name="email" type="email" value="{{ formEmailRaw }}" sc-camel-on-change="{{ setEmail }}" autocomplete="email" inputmode="email" maxlength="254" aria-invalid="{{ hasEmailError }}" aria-describedby="join-email-error" placeholder="johndoe@example.com" class="{{ emailFieldClass }}" style="background:transparent;border:0;border-bottom:1px solid #DDD9CE;font-size:18px;font-weight:300;padding:8px 0;outline:none;color:#111110" style-focus="border-bottom-color:#E5322B">
+              <sc-if value="{{ hasEmailError }}" hint-placeholder-val="{{ false }}"><span id="join-email-error" class="cc-field-error" role="alert">{{ emailError }}</span></sc-if>
+            </label>
+
+            <div class="{{ consentFieldClass }}" style="display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px 12px;align-items:start;border:1px solid #DDD9CE;padding:13px 14px">
+              <label for="join-consent" class="cc-visually-hidden">Consent to receive Campus Compile event announcements by email</label>
+              <input ref="{{ consentRef }}" id="join-consent" name="consent" type="checkbox" checked="{{ formConsent }}" sc-camel-on-change="{{ setConsent }}" aria-invalid="{{ hasConsentError }}" aria-describedby="join-consent-error" style="appearance:none;width:16px;height:16px;margin:2px 0 0;border:1px solid #111110;background:{{ consentBackground }};box-shadow:inset 0 0 0 3px #F8F6F0;cursor:pointer">
+              <span style="font-size:14px;font-weight:300;line-height:1.55;color:#33322D">I <button type="button" sc-camel-on-click="{{ togglePrivacyNotice }}" aria-expanded="{{ privacyNoticeOpen }}" aria-controls="join-privacy-notice" style="appearance:none;border:0;background:transparent;color:#E5322B;font:inherit;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px">agree</button> to receive Campus Compile event announcements by email.</span>
+              <sc-if value="{{ hasConsentError }}" hint-placeholder-val="{{ false }}"><span id="join-consent-error" class="cc-field-error" role="alert" style="grid-column:2">{{ consentError }}</span></sc-if>
+              <sc-if value="{{ privacyNoticeOpen }}" hint-placeholder-val="{{ false }}"><p id="join-privacy-notice" style="grid-column:2;font-size:12px;font-weight:300;line-height:1.6;color:#6E6C64;margin:0;text-wrap:pretty">Campus Compile stores your name and email in Brevo and uses them to send event announcements. We keep this data until you unsubscribe. You can withdraw your consent at any time.</p></sc-if>
+            </div>
+
+            <div class="cc-visually-hidden" aria-hidden="true">
+              <label for="join-website">Website</label>
+              <input id="join-website" name="website" type="text" value="{{ formWebsite }}" sc-camel-on-change="{{ setWebsite }}" autocomplete="off" tabindex="-1">
+            </div>
+
+            <div>
+              <div ref="{{ turnstileRef }}" id="cc-turnstile" style="min-height:0"></div>
+              <sc-if value="{{ hasTurnstileError }}" hint-placeholder-val="{{ false }}"><div class="cc-field-error" role="alert">{{ turnstileError }}</div></sc-if>
+            </div>
+
+            <button type="submit" disabled="{{ submitting }}" style="appearance:none;border:0;background:#111110;color:#F8F6F0;font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:0.18em;padding:18px 22px;cursor:pointer;margin-top:4px;transition:background .25s ease;opacity:{{ submitOpacity }}" style-hover="background:#E5322B">
+              <sc-if value="{{ notSubmitting }}" hint-placeholder-val="{{ true }}">&gt; GET EVENT UPDATES</sc-if>
+              <sc-if value="{{ submitting }}" hint-placeholder-val="{{ false }}"><span class="cc-spinner" aria-hidden="true"></span>SENDING…</sc-if>
+            </button>
+
+          </form>
+        </sc-if>
+
+        <sc-if value="{{ subscriptionSuccess }}" hint-placeholder-val="{{ false }}">
+          <div ref="{{ successRef }}" role="status" tabindex="-1" style="min-height:300px;display:flex;flex-direction:column;justify-content:center;animation:fadeIn .4s ease both;outline:none">
+            <div style="font-family:'JetBrains Mono', monospace;font-size:11px;line-height:2.2;color:#6E6C64"><span style="color:#E5322B">&gt;</span> SUBSCRIPTION CONFIRMED</div>
+            <div style="font-size:clamp(22px,2.6vw,32px);font-weight:400;line-height:1.2;margin:20px 0 14px">You're on the list.</div>
+            <div style="font-size:16px;font-weight:300;line-height:1.7;color:#33322D;max-width:40ch">We'll send Campus Compile event announcements to {{ formEmail }}. Every email includes an unsubscribe link.</div>
+            <button type="button" sc-camel-on-click="{{ returnToSite }}" style="appearance:none;background:transparent;border:1px solid #DDD9CE;font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;padding:14px 18px;cursor:pointer;margin-top:28px;align-self:flex-start;color:#111110" style-hover="border-color:#111110">&gt; BACK TO SITE</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ subscriptionError }}" hint-placeholder-val="{{ false }}">
+          <div role="alert" aria-live="assertive" style="min-height:300px;display:flex;flex-direction:column;justify-content:center;animation:fadeIn .4s ease both">
+            <div style="font-family:'JetBrains Mono', monospace;font-size:11px;line-height:2.2;color:#E5322B">&gt; SOMETHING WENT WRONG</div>
+            <div style="font-size:clamp(22px,2.6vw,32px);font-weight:400;line-height:1.2;margin:20px 0 14px">We couldn't complete your subscription.</div>
+            <div style="font-size:16px;font-weight:300;line-height:1.7;color:#33322D;max-width:42ch">{{ subscriptionErrorMessage }}</div>
+            <sc-if value="{{ hasRequestId }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono', monospace;font-size:10px;line-height:1.6;letter-spacing:0.06em;color:#6E6C64;margin-top:16px">REQUEST ID · {{ subscriptionRequestId }}</div></sc-if>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px">
+              <button ref="{{ retryRef }}" type="button" sc-camel-on-click="{{ retrySubscription }}" style="appearance:none;border:0;background:#111110;color:#F8F6F0;font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;padding:14px 18px;cursor:pointer" style-hover="background:#E5322B">&gt; TRY AGAIN</button>
+              <button type="button" sc-camel-on-click="{{ returnToSite }}" style="appearance:none;background:transparent;border:1px solid #DDD9CE;font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;padding:14px 18px;cursor:pointer;color:#111110" style-hover="border-color:#111110">&gt; BACK TO SITE</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+
+  <footer`
+      );
+
+      source = source.replace(
+        'this.state = { idx: 0, day: null, name: "", email: "", applicationNotice: false, submitted: false };',
+        'this.state = { idx: 0, day: null, name: "", email: "", consent: false, website: "", privacyNoticeOpen: false, applicationNotice: false, subscriptionStatus: "form", fieldErrors: {}, formMessage: "", requestId: "", turnstileToken: "", turnstileSiteKey: "" };'
+      );
+
+      source = source.replace(
+        "    this.labelRef = React.createRef();",
+        `    this.labelRef = React.createRef();
+    this.nameRef = React.createRef();
+    this.emailRef = React.createRef();
+    this.consentRef = React.createRef();
+    this.turnstileRef = React.createRef();
+    this.retryRef = React.createRef();
+    this.successRef = React.createRef();`
+      );
+
+      source = source.replace(
+        "    this.onTouchEnd = this.onTouchEnd.bind(this);",
+        `    this.onTouchEnd = this.onTouchEnd.bind(this);
+    this.onHashChange = this.onHashChange.bind(this);
+    this.submitSubscription = this.submitSubscription.bind(this);
+    this.retrySubscription = this.retrySubscription.bind(this);
+    this.returnToSite = this.returnToSite.bind(this);`
+      );
+
+      source = source.replace(
+        "    this.lastWheelAt = 0;",
+        `    this.lastWheelAt = 0;
+    this.returnFocusEl = document.querySelector('a[href="#join"]');
+    window.addEventListener("hashchange", this.onHashChange);
+    this.loadTurnstile();
+    if (window.location.hash === "#join") setTimeout(() => this.focusRef(this.nameRef), 80);`
+      );
+
+      source = source.replace(
+        "    this.alive = false;\n    cancelAnimationFrame(this.raf);",
+        `    this.alive = false;
+    window.removeEventListener("hashchange", this.onHashChange);
+    cancelAnimationFrame(this.raf);`
+      );
+
+      source = source.replace(
+        "\n  renderVals() {",
+        `
+  focusRef(ref) {
+    if (ref && ref.current && typeof ref.current.focus === "function") ref.current.focus();
+  }
+
+  onHashChange() {
+    if (window.location.hash !== "#join") return;
+    const active = document.activeElement;
+    if (active && active.matches && active.matches('a[href="#join"]')) this.returnFocusEl = active;
+    this.setState({ subscriptionStatus: "form" }, () => setTimeout(() => this.focusRef(this.nameRef), 60));
+  }
+
+  async loadTurnstile() {
+    try {
+      const response = await fetch("/api/subscribe", { headers: { accept: "application/json" } });
+      const data = await response.json();
+      if (!response.ok || !data.turnstileSiteKey) throw new Error("configuration unavailable");
+      await this.ensureTurnstileScript();
+      if (!this.alive) return;
+      this.setState({ turnstileSiteKey: data.turnstileSiteKey }, () => this.renderTurnstile());
+    } catch {
+      if (!this.alive) return;
+      this.setState({ turnstileSiteKey: "" });
+    }
+  }
+
+  ensureTurnstileScript() {
+    if (window.turnstile) return Promise.resolve();
+    const existing = document.querySelector("script[data-campus-compile-turnstile]");
+    if (existing) {
+      return new Promise((resolve, reject) => {
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", reject, { once: true });
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      script.dataset.campusCompileTurnstile = "true";
+      script.addEventListener("load", resolve, { once: true });
+      script.addEventListener("error", reject, { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  renderTurnstile() {
+    if (!window.turnstile || !this.turnstileRef.current || !this.state.turnstileSiteKey || this.turnstileWidgetId != null) return;
+    this.turnstileWidgetId = window.turnstile.render(this.turnstileRef.current, {
+      sitekey: this.state.turnstileSiteKey,
+      action: "newsletter_subscribe",
+      theme: "light",
+      size: "flexible",
+      appearance: "interaction-only",
+      callback: token => this.setState({ turnstileToken: token, fieldErrors: { ...this.state.fieldErrors, turnstile: "" } }),
+      "expired-callback": () => this.setState({ turnstileToken: "" }),
+      "error-callback": () => this.setState({ turnstileToken: "", fieldErrors: { ...this.state.fieldErrors, turnstile: "The security check could not load. Please try again." } })
+    });
+  }
+
+  focusFirstError(fieldErrors) {
+    if (fieldErrors.name) return this.focusRef(this.nameRef);
+    if (fieldErrors.email) return this.focusRef(this.emailRef);
+    if (fieldErrors.consent) return this.focusRef(this.consentRef);
+    if (fieldErrors.turnstile && this.turnstileRef.current) {
+      const frame = this.turnstileRef.current.querySelector("iframe");
+      if (frame) frame.focus();
+    }
+  }
+
+  clientFieldErrors() {
+    const errors = {};
+    const name = (this.state.name || "").normalize("NFKC").replace(/\\s+/g, " ").trim();
+    const email = (this.state.email || "").normalize("NFKC").trim().toLowerCase();
+    if (!name) errors.name = "Enter your name.";
+    else if (name.length > 100) errors.name = "Keep your name to 100 characters or fewer.";
+    if (!email || email.length > 254 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) errors.email = "Check the email address and try again.";
+    if (!this.state.consent) errors.consent = "Consent is required to subscribe to email announcements.";
+    if (!Object.keys(errors).length && !this.state.turnstileToken) errors.turnstile = "Complete the security check and try again.";
+    return { errors, name, email };
+  }
+
+  async submitSubscription(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    if (this.state.subscriptionStatus === "loading") return;
+
+    const validation = this.clientFieldErrors();
+    if (Object.keys(validation.errors).length) {
+      this.setState({ fieldErrors: validation.errors, formMessage: "Please check the highlighted fields." }, () => this.focusFirstError(validation.errors));
+      return;
+    }
+
+    this.setState({ subscriptionStatus: "loading", fieldErrors: {}, formMessage: "" });
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({
+          name: validation.name,
+          email: validation.email,
+          consent: this.state.consent === true,
+          website: this.state.website || "",
+          turnstileToken: this.state.turnstileToken
+        })
+      });
+
+      let data = {};
+      try { data = await response.json(); } catch {}
+      const requestId = data.requestId || response.headers.get("cf-ray") || "";
+
+      if (response.ok && data.ok) {
+        this.setState({ subscriptionStatus: "success", requestId, name: validation.name, email: validation.email }, () => this.focusRef(this.successRef));
+        return;
+      }
+
+      if (response.status === 422 && data.fieldErrors) {
+        const fieldErrors = { ...data.fieldErrors };
+        if (fieldErrors.name || fieldErrors.email || fieldErrors.consent) delete fieldErrors.turnstile;
+        this.setState({
+          subscriptionStatus: "form",
+          fieldErrors,
+          formMessage: data.message || "Please check the highlighted fields.",
+          requestId,
+          turnstileToken: fieldErrors.turnstile ? "" : this.state.turnstileToken
+        }, () => {
+          if (fieldErrors.turnstile) {
+            if (window.turnstile && this.turnstileWidgetId != null) window.turnstile.reset(this.turnstileWidgetId);
+          }
+          this.focusFirstError(fieldErrors);
+        });
+        return;
+      }
+
+      this.setState({
+        subscriptionStatus: "error",
+        requestId,
+        turnstileToken: "",
+        subscriptionErrorMessage: data.message || "The service could not be reached. Please try again."
+      }, () => this.focusRef(this.retryRef));
+    } catch {
+      this.setState({
+        subscriptionStatus: "error",
+        requestId: "",
+        turnstileToken: "",
+        subscriptionErrorMessage: "The network connection failed. Please check your connection and try again."
+      }, () => this.focusRef(this.retryRef));
+    }
+  }
+
+  retrySubscription() {
+    this.turnstileWidgetId = null;
+    this.setState({ subscriptionStatus: "form", fieldErrors: {}, formMessage: "", requestId: "", turnstileToken: "" }, () => {
+      this.renderTurnstile();
+      this.focusRef(this.nameRef);
+    });
+  }
+
+  returnToSite() {
+    this.turnstileWidgetId = null;
+    this.setState({ subscriptionStatus: "form", fieldErrors: {}, formMessage: "", requestId: "", turnstileToken: "" }, () => {
+      const top = document.getElementById("top");
+      if (top) top.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      if (this.returnFocusEl && typeof this.returnFocusEl.focus === "function") this.returnFocusEl.focus({ preventScroll: true });
+      this.renderTurnstile();
+    });
+  }
+
+  renderVals() {`
+      );
+
+      source = source.replace(
+        /      formName: this\.state\.name,[\s\S]*?      notSubmitted: !this\.state\.submitted/,
+        `      formName: this.state.name,
+      formEmailRaw: this.state.email,
+      formEmail: this.state.email || "your inbox",
+      formConsent: !!this.state.consent,
+      formWebsite: this.state.website,
+      nameRef: this.nameRef,
+      emailRef: this.emailRef,
+      consentRef: this.consentRef,
+      turnstileRef: this.turnstileRef,
+      retryRef: this.retryRef,
+      successRef: this.successRef,
+      setName: e => this.setState({ name: e.target.value, fieldErrors: { ...this.state.fieldErrors, name: "" }, formMessage: "" }),
+      setEmail: e => this.setState({ email: e.target.value, fieldErrors: { ...this.state.fieldErrors, email: "" }, formMessage: "" }),
+      setConsent: e => this.setState({ consent: e.target.checked, fieldErrors: { ...this.state.fieldErrors, consent: "" }, formMessage: "" }),
+      setWebsite: e => this.setState({ website: e.target.value }),
+      togglePrivacyNotice: () => this.setState(state => ({ privacyNoticeOpen: !state.privacyNoticeOpen })),
+      submitSubscription: this.submitSubscription,
+      retrySubscription: this.retrySubscription,
+      returnToSite: this.returnToSite,
+      subscriptionFormVisible: this.state.subscriptionStatus === "form" || this.state.subscriptionStatus === "loading",
+      subscriptionSuccess: this.state.subscriptionStatus === "success",
+      subscriptionError: this.state.subscriptionStatus === "error",
+      submitting: this.state.subscriptionStatus === "loading",
+      notSubmitting: this.state.subscriptionStatus !== "loading",
+      submitOpacity: this.state.subscriptionStatus === "loading" ? "0.62" : "1",
+      nameError: this.state.fieldErrors.name || "",
+      emailError: this.state.fieldErrors.email || "",
+      consentError: this.state.fieldErrors.consent || "",
+      turnstileError: this.state.fieldErrors.turnstile || "",
+      hasNameError: !!this.state.fieldErrors.name,
+      hasEmailError: !!this.state.fieldErrors.email,
+      hasConsentError: !!this.state.fieldErrors.consent,
+      hasTurnstileError: !!this.state.fieldErrors.turnstile,
+      nameFieldClass: this.state.fieldErrors.name ? "cc-field-invalid" : "",
+      emailFieldClass: this.state.fieldErrors.email ? "cc-field-invalid" : "",
+      consentFieldClass: this.state.fieldErrors.consent ? "cc-field-invalid" : "",
+      consentBackground: this.state.consent ? "#E5322B" : "transparent",
+      privacyNoticeOpen: !!this.state.privacyNoticeOpen,
+      subscriptionErrorMessage: this.state.subscriptionErrorMessage || "The service could not be reached. Please try again.",
+      subscriptionRequestId: this.state.requestId || "",
+      hasRequestId: !!this.state.requestId,
+
+      applicationNotice: !!this.state.applicationNotice,
+      notApplicationNotice: !this.state.applicationNotice,
+      showApplicationNotice: () => this.setState({ applicationNotice: true }),
+      hideApplicationNotice: () => this.setState({ applicationNotice: false })`
+      );
 
       template.textContent = JSON.stringify(source);
     })();

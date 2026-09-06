@@ -1,0 +1,52 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "campuscompile",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2026-09-06",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // BREVO_API_KEY and TURNSTILE_SECRET_KEY must be encrypted Pages secrets.
+  "secrets": {
+    "required": ["BREVO_API_KEY", "TURNSTILE_SECRET_KEY"]
+  },
+
+  "vars": {
+    "BREVO_LIST_ID": "5",
+    "ALLOWED_ORIGIN": "https://campuscompile.eu",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAEqXvMiUSzMnHwvy"
+  },
+
+  "ratelimits": [
+    {
+      "name": "SUBSCRIBE_RATE_LIMITER",
+      "namespace_id": "20260906",
+      "simple": {
+        "limit": 4,
+        "period": 60
+      }
+    }
+  ],
+
+  "env": {
+    "preview": {
+      "secrets": {
+        "required": ["BREVO_API_KEY", "TURNSTILE_SECRET_KEY"]
+      },
+      "vars": {
+        "BREVO_LIST_ID": "REPLACE_WITH_PREVIEW_LIST_ID",
+        "ALLOWED_ORIGIN": "REPLACE_WITH_PREVIEW_PUBLIC_ORIGIN",
+        "TURNSTILE_SITE_KEY": "REPLACE_WITH_PREVIEW_TURNSTILE_SITE_KEY"
+      },
+      "ratelimits": [
+        {
+          "name": "SUBSCRIBE_RATE_LIMITER",
+          "namespace_id": "20260907",
+          "simple": {
+            "limit": 4,
+            "period": 60
+          }
+        }
+      ]
+    }
+  }
+}

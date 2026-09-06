@@ -42,6 +42,8 @@ Do not introduce a new color for a role already covered by this palette. Red sho
 - Body copy uses a generous line height, approximately `1.65–1.7`.
 - Mono labels are usually uppercase, `10–11px`, with letter spacing between `0.12em` and `0.2em`.
 - Prefer sentence case for normal headings. Do not write whole paragraphs in uppercase or monospace.
+- Primary section headings, including “What we are” and “Events,” share the same Jost sizing, weight, and sentence-case treatment.
+- “What we are” includes one short introductory sentence that frames the three principle cards below it.
 - Use `text-wrap: pretty` and controlled text widths where they prevent awkward line endings.
 
 ## Layout and spacing
@@ -65,6 +67,16 @@ The overview slide uses a balanced two-column composition. Each headline phrase 
 - Hover states invert or emphasize existing palette colors. Avoid movement that shifts surrounding layout.
 - Use actual `<button>` elements for in-page state changes and `<a>` elements for real destinations.
 - A button without a working destination must open an honest status panel rather than a dead link or misleading success message.
+
+## Forms and status panels
+
+- The Join form uses the established square border, ink button, red validation accent, Jost field text, and JetBrains Mono labels.
+- Consent checkboxes are unchecked by default and use the red accent only after an explicit selection.
+- Async forms preserve entered values across retryable errors and use distinct form, loading, success, field-error, and service-error states.
+- Service-error panels provide one primary retry action, one return action, and a request identifier when the server supplies one.
+- Form errors are connected to their fields, announced through live regions, and followed by programmatic focus on the problem or recovery action.
+- Show ordinary field errors before any Turnstile error so one submission does not repeat two recovery instructions for the same failed attempt.
+- The Join form keeps its default state to name, email, consent, and the submit action. The red, underlined word “agree” inside the consent copy toggles the inline privacy notice; the disclosure remains keyboard accessible.
 
 ## Motion
 
@@ -128,13 +140,13 @@ New event blocks should reuse this four-slide structure unless the event genuine
 
 The Join section is for event email updates. It asks for a name and email address; it does not ask for a study program.
 
-The current form has no backend or mailing-list connection. Clicking “Get event updates” must clearly say that subscriptions are not available yet and that the entered details were not saved. It must not claim that a confirmation email was sent.
+The current form submits to the same-origin Cloudflare Pages Function, which validates the request and creates or updates a contact in the configured Brevo list. It must fail closed when its server configuration is incomplete and must not claim success until Brevo accepts the request.
 
-When an email service is connected:
+For this integration:
 
 - Explain that subscribers receive occasional messages about hackathons, workshops, and events in Klagenfurt.
-- Include appropriate consent language and an unsubscribe path.
-- Prefer a provider-hosted form or a server-side endpoint.
+- Ask only for name, email, and explicit, unchecked consent; keep the concise privacy notice behind the inline “agree” disclosure and state that consent can be withdrawn.
+- Keep all provider access server-side through the Pages Function.
 - Never expose an API key in the page source.
 - Update the success message only after a submission has been accepted by the service.
 
@@ -171,6 +183,6 @@ Before considering a visual change complete, check:
 - Slide dots, wheel navigation, labels, counter, and progress line stay synchronized.
 - Provisional information is visibly qualified.
 - Buttons either reach a real destination or show an accurate status panel.
-- The Join form does not claim to save or send data while disconnected.
+- The Join form does not claim success until the configured email service accepts the subscription.
 - Desktop and narrow/mobile layouts remain readable.
 - The browser console contains no new JavaScript errors.
