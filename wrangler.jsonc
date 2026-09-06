@@ -34,9 +34,9 @@
         "required": ["BREVO_API_KEY", "TURNSTILE_SECRET_KEY"]
       },
       "vars": {
-        "BREVO_LIST_ID": "REPLACE_WITH_PREVIEW_LIST_ID",
-        "ALLOWED_ORIGIN": "REPLACE_WITH_PREVIEW_PUBLIC_ORIGIN",
-        "TURNSTILE_SITE_KEY": "REPLACE_WITH_PREVIEW_TURNSTILE_SITE_KEY"
+        "BREVO_LIST_ID": "6",
+        "ALLOWED_ORIGIN": "https://campuscompile.eu/",
+        "TURNSTILE_SITE_KEY": "0x4AAAAAAEqXvMiUSzMnHwvy"
       },
       "ratelimits": [
         {
