@@ -1,8 +1,5 @@
 dist/
 .codex-remote-attachments/
 node_modules/
-.pnpm-store/
 .dev.vars*
 .env*
-.wrangler/
-.wrangler-check/

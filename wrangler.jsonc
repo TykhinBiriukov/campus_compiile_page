@@ -1,5 +1,6 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Runtime configuration consumed by Cloudflare Pages Git deployments.
+  // This file does not install or run a local deployment tool.
   "name": "campuscompile",
   "pages_build_output_dir": ".",
   "compatibility_date": "2026-09-06",

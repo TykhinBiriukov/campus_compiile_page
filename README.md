@@ -15,9 +15,7 @@ Live site: [campuscompile.eu](https://campuscompile.eu)
 ├── functions/api/subscribe.js # Cloudflare Pages subscription endpoint
 ├── index.html                 # Production website and self-contained bundle
 ├── test/subscribe.test.js     # Subscription endpoint contract tests
-├── wrangler.jsonc             # Pages bindings and non-secret environment config
-└── .github/workflows/
-    └── deploy.yaml            # Cloudflare Pages deployment workflow
+└── wrangler.jsonc             # Pages runtime bindings and non-secret config
 ```
 
 Read [AGENTS.md](AGENTS.md) and [the design playbook](docs/design-playbook.md) before changing the page.
@@ -38,33 +36,26 @@ http://127.0.0.1:8765
 
 Do not rely only on opening `index.html` through a `file://` URL. Test through HTTP so browser behavior is closer to the deployed site.
 
+The static local preview does not execute the Cloudflare Pages Function. Test the complete subscription flow on a Cloudflare preview or production deployment.
+
+## Deployment
+
+The Cloudflare Pages project is connected directly to this GitHub repository. No local deployment CLI or separate GitHub Actions deployment workflow is required. Leave the Pages build command blank, use the repository root as the root directory and `.` as the build output directory. A push to the configured production branch deploys `index.html` together with the `functions` directory.
+
+`wrangler.jsonc` remains in the repository only as Cloudflare Pages runtime configuration. Cloudflare's Git deployment reads it to provide the public environment values and the `SUBSCRIBE_RATE_LIMITER` binding used by the server function; the file does not initiate a deployment. Keep the encrypted `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` values in the Cloudflare Pages dashboard.
+
 ## Newsletter integration
 
 The Join form posts JSON to the same-origin Cloudflare Pages Function at `/api/subscribe`. The Function validates and normalizes the request, verifies Turnstile, applies a Cloudflare rate limit, and creates or updates the Brevo contact with `updateEnabled: true`.
 
 After Brevo accepts the contact, the page replaces the form with its in-page success panel. The Function does not send a welcome or confirmation email itself; configure that message as a Brevo automation if one is required.
 
-Install the development-only Wrangler dependency and run the Pages preview when testing the complete form:
-
-```powershell
-pnpm install
-pnpm exec wrangler pages dev --port 8788
-```
-
-Use an ignored `.dev.vars` file for local secrets. Never commit this file:
-
-```dotenv
-BREVO_API_KEY=...
-TURNSTILE_SECRET_KEY=...
-```
-
 Before deployment, replace the non-secret placeholders in `wrangler.jsonc` with a numeric Brevo list ID, the exact public origin, and the public Turnstile site key. Configure `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` as encrypted Cloudflare Pages secrets. Production and preview use separate origins, Brevo lists, Turnstile widgets, secrets, and rate-limit namespaces; configure both environments before enabling preview subscriptions. A placeholder or missing binding makes the endpoint fail closed with a user-safe “temporarily unavailable” response.
 
-Run the endpoint contract tests and compile the Pages Function before deployment:
+Run the dependency-free endpoint contract tests before deployment:
 
 ```powershell
-pnpm test
-pnpm run check:pages
+node --test --test-isolation=none
 ```
 
 The Brevo contact attribute `FNAME` must exist as a text attribute in the Brevo account. Turnstile must allow the hostname configured by `ALLOWED_ORIGIN` and use the `newsletter_subscribe` action.
