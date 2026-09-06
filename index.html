@@ -862,20 +862,44 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (window.location.hash !== "#join") return;
     const active = document.activeElement;
     if (active && active.matches && active.matches('a[href="#join"]')) this.returnFocusEl = active;
-    this.setState({ subscriptionStatus: "form" }, () => setTimeout(() => this.focusRef(this.nameRef), 60));
+    this.setState({ subscriptionStatus: "form" }, () => {
+      if (!this.state.turnstileSiteKey) this.loadTurnstile();
+      setTimeout(() => this.focusRef(this.nameRef), 60);
+    });
   }
 
   async loadTurnstile() {
     try {
       const response = await fetch("/api/subscribe", { headers: { accept: "application/json" } });
-      const data = await response.json();
-      if (!response.ok || !data.turnstileSiteKey) throw new Error("configuration unavailable");
+      let data = {};
+      try { data = await response.json(); } catch {}
+      const requestId = data.requestId || response.headers.get("cf-ray") || "";
+      if (!response.ok || !data.turnstileSiteKey) {
+        const configurationUnavailable = data.code === "origin_not_allowed" || data.code === "configuration_error";
+        if (!this.alive) return;
+        this.setState({
+          subscriptionStatus: "error",
+          requestId,
+          turnstileToken: "",
+          turnstileSiteKey: "",
+          subscriptionErrorMessage: configurationUnavailable
+            ? "Event updates are temporarily unavailable. Please try again later."
+            : data.message || "The security check could not be prepared. Please try again."
+        }, () => this.focusRef(this.retryRef));
+        return;
+      }
       await this.ensureTurnstileScript();
       if (!this.alive) return;
       this.setState({ turnstileSiteKey: data.turnstileSiteKey }, () => this.renderTurnstile());
     } catch {
       if (!this.alive) return;
-      this.setState({ turnstileSiteKey: "" });
+      this.setState({
+        subscriptionStatus: "error",
+        requestId: "",
+        turnstileToken: "",
+        turnstileSiteKey: "",
+        subscriptionErrorMessage: "The security check could not load. Please check your connection and try again."
+      }, () => this.focusRef(this.retryRef));
     }
   }
 
@@ -1006,9 +1030,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   retrySubscription() {
+    const needsTurnstileBootstrap = !this.state.turnstileSiteKey;
     this.turnstileWidgetId = null;
     this.setState({ subscriptionStatus: "form", fieldErrors: {}, formMessage: "", requestId: "", turnstileToken: "" }, () => {
-      this.renderTurnstile();
+      if (needsTurnstileBootstrap) this.loadTurnstile();
+      else this.renderTurnstile();
       this.focusRef(this.nameRef);
     });
   }

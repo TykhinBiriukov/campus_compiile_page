@@ -76,6 +76,7 @@ The overview slide uses a balanced two-column composition. Each headline phrase 
 - Service-error panels provide one primary retry action, one return action, and a request identifier when the server supplies one.
 - Form errors are connected to their fields, announced through live regions, and followed by programmatic focus on the problem or recovery action.
 - Show ordinary field errors before any Turnstile error so one submission does not repeat two recovery instructions for the same failed attempt.
+- Treat a failed Turnstile bootstrap or server configuration check as a service error, not as an incomplete-security-check field error; retain the request identifier when the endpoint provides one.
 - The Join form keeps its default state to name, email, consent, and the submit action. The red, underlined word “agree” inside the consent copy toggles the inline privacy notice; the disclosure remains keyboard accessible.
 
 ## Motion

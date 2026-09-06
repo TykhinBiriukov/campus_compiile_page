@@ -40,9 +40,9 @@ The static local preview does not execute the Cloudflare Pages Function. Test th
 
 ## Deployment
 
-The Cloudflare Pages project is connected directly to this GitHub repository. No local deployment CLI or separate GitHub Actions deployment workflow is required. Leave the Pages build command blank, use the repository root as the root directory and `.` as the build output directory. A push to the configured production branch deploys `index.html` together with the `functions` directory.
+The production site is deployed by [the GitHub Actions workflow](.github/workflows/deploy.yaml). A push to `main`, or a manual workflow run, invokes `cloudflare/wrangler-action@v4` with Wrangler 4 and deploys the repository root to the `campuscompile` Pages project. The action installs Wrangler inside the GitHub runner; no local Wrangler or pnpm installation is required.
 
-`wrangler.jsonc` remains in the repository only as Cloudflare Pages runtime configuration. Cloudflare's Git deployment reads it to provide the public environment values and the `SUBSCRIBE_RATE_LIMITER` binding used by the server function; the file does not initiate a deployment. Keep the encrypted `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` values in the Cloudflare Pages dashboard.
+`wrangler.jsonc` is the source of truth for Cloudflare Pages runtime configuration. Wrangler reads it during the GitHub Actions deployment to provide the public environment values and the `SUBSCRIBE_RATE_LIMITER` binding used by the server function. Keep the encrypted `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` values in the Cloudflare Pages dashboard, and keep `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub Actions secrets.
 
 ## Newsletter integration
 
