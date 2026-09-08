@@ -50,6 +50,8 @@ The Join form posts JSON to the same-origin Cloudflare Pages Function at `/api/s
 
 After Brevo accepts the contact, the page replaces the form with its in-page success panel. The Function does not send a welcome or confirmation email itself; configure that message as a Brevo automation if one is required.
 
+The initial `GET /api/subscribe` checks that all required runtime values are present before returning the public Turnstile site key. A successful bootstrap does not verify the validity of the secrets or access to the Brevo list; that still requires an end-to-end submission. Siteverify receives a generated UUID as its idempotency key, while the Cloudflare Ray ID remains the diagnostic request ID returned to the browser.
+
 Before deployment, replace the non-secret placeholders in `wrangler.jsonc` with a numeric Brevo list ID, the exact public origin, and the public Turnstile site key. Configure `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` as encrypted Cloudflare Pages secrets. Production and preview use separate origins, Brevo lists, Turnstile widgets, and secrets; configure both environments before enabling preview subscriptions. A placeholder or missing required value makes the endpoint fail closed with a user-safe “temporarily unavailable” response.
 
 Run the dependency-free endpoint contract tests before deployment:

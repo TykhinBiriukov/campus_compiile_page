@@ -150,6 +150,48 @@ test("rejects missing server configuration safely", async () => {
   assert.doesNotMatch(JSON.stringify(result.body), /BREVO_API_KEY/);
 });
 
+test("bootstrap checks all required configuration without exposing secrets", async () => {
+  for (const key of ["BREVO_API_KEY", "BREVO_LIST_ID", "TURNSTILE_SECRET_KEY", "TURNSTILE_SITE_KEY"]) {
+    const result = await read(await onRequest({
+      request: new Request(`${origin}/api/subscribe`),
+      env: makeEnv({ [key]: "" }),
+    }));
+    assert.equal(result.status, 503, key);
+    assert.equal(result.body.code, "configuration_unavailable");
+    assert.doesNotMatch(JSON.stringify(result.body), /test-api-key|test-turnstile-secret/);
+  }
+  const result = await read(await onRequest({
+    request: new Request(`${origin}/api/subscribe`), env: makeEnv(),
+  }));
+  assert.equal(result.status, 200);
+  assert.equal(result.body.turnstileSiteKey, "test-turnstile-site-key");
+});
+
+test("uses a UUID for Siteverify even when Cloudflare supplies a Ray ID", async () => {
+  const originalFetch = globalThis.fetch;
+  const rayId = "a37deb18a846f52b-VIE";
+  let verificationCalls = 0;
+  globalThis.fetch = async (url, init) => {
+    if (String(url).includes("siteverify")) {
+      verificationCalls += 1;
+      const { idempotency_key: key } = JSON.parse(init.body);
+      const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key);
+      return Response.json({ success: valid, action: "newsletter_subscribe", hostname: "campuscompile.eu" });
+    }
+    return new Response(null, { status: 204 });
+  };
+  try {
+    const request = makeRequest(validPayload());
+    request.headers.set("cf-ray", rayId);
+    const result = await read(await onRequest({ request, env: makeEnv() }));
+    assert.equal(verificationCalls, 1);
+    assert.equal(result.status, 200);
+    assert.equal(result.body.requestId, rayId);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("returns 429 when an optional runtime rate limiter blocks the request", async () => {
   const result = await read(
     await onRequest({
