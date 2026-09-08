@@ -217,7 +217,7 @@ async function fetchWithTimeout(url, init, timeoutMs) {
   }
 }
 
-async function verifyTurnstile({ token, request, env, requestId }) {
+async function verifyTurnstile({ token, request, env }) {
   const remoteIp = request.headers.get("cf-connecting-ip");
   const response = await fetchWithTimeout(
     TURNSTILE_VERIFY_URL,
@@ -228,7 +228,8 @@ async function verifyTurnstile({ token, request, env, requestId }) {
         secret: env.TURNSTILE_SECRET_KEY,
         response: token,
         ...(remoteIp ? { remoteip: remoteIp } : {}),
-        idempotency_key: requestId,
+        // Siteverify requires a UUID; the diagnostic cf-ray ID is not one.
+        idempotency_key: crypto.randomUUID(),
       }),
     },
     8_000,
@@ -285,7 +286,7 @@ async function handleGet(request, env, requestId) {
     });
   }
 
-  if (typeof env.TURNSTILE_SITE_KEY !== "string" || !env.TURNSTILE_SITE_KEY) {
+  if (!validateEnvironment(env).ok) {
     logEvent(requestId, "configuration_unavailable", 503);
     return errorResponse({
       code: "configuration_unavailable",
@@ -391,7 +392,6 @@ async function handlePost(request, env, requestId) {
       token: validated.turnstileToken,
       request,
       env,
-      requestId,
     });
   } catch {
     logEvent(requestId, "verification_unavailable", 503);
