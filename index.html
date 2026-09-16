@@ -382,6 +382,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   <script>
     (function patchGeneratedSite() {
+      const manifestElement = document.querySelector('script[type="__bundler/manifest"]');
+      if (manifestElement) {
+        const manifest = JSON.parse(manifestElement.textContent);
+        const aauLogo = manifest["f3a1c9de-7b2e-4c1a-9d3f-1a2b3c4d5e6f"];
+        if (aauLogo && aauLogo.mime === "image/svg+xml" && !aauLogo.compressed) {
+          const svg = atob(aauLogo.data);
+          const coloredSvg = svg.replace(
+            "<defs>\n  \n </defs>",
+            "<defs><style>.fil0{fill:#539FC6}.fil1{fill:#436F80}</style></defs>"
+          );
+          if (coloredSvg !== svg) {
+            aauLogo.data = btoa(coloredSvg);
+            manifestElement.textContent = JSON.stringify(manifest);
+          }
+        }
+      }
+
       const template = document.querySelector('script[type="__bundler/template"]');
       if (!template) return;
 
