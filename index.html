@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html><head>
   <meta charset="utf-8">
-  <title>Bundled Page</title>
+  <title>Campus Compile · AI &amp; Software Community in Klagenfurt</title>
+  <meta name="description" content="Campus Compile brings people together for hackathons, workshops and AI and software events in Klagenfurt.">
+  <link rel="canonical" href="https://campuscompile.eu/">
+  <meta property="og:title" content="Campus Compile · AI &amp; Software Community in Klagenfurt">
+  <meta property="og:description" content="Campus Compile brings people together for hackathons, workshops and AI and software events in Klagenfurt.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Campus Compile">
+  <meta property="og:url" content="https://campuscompile.eu/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Campus Compile · AI &amp; Software Community in Klagenfurt">
+  <meta name="twitter:description" content="Campus Compile brings people together for hackathons, workshops and AI and software events in Klagenfurt.">
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -420,14 +430,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       source = source.replace(
         "</head>",
-        `<title>Campus Compile · AI & Software Community in Klagenfurt</title>
-<meta name="description" content="Campus Compile connects people, helps them build ambitious ideas and brings student-made products into the real world.">
-<meta property="og:title" content="Community for AI and Software">
-<meta property="og:description" content="Meet people, build interesting things and connect your work with the real world.">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Community for AI and Software">
-<meta name="twitter:description" content="Campus Compile · Klagenfurt">
+        `${Array.from(document.head.querySelectorAll('title, meta[name="description"], link[rel="canonical"], meta[property^="og:"], meta[name^="twitter:"]')).map(el => el.outerHTML).join("\n")}
 <style>
   .cc-field-error {
     margin-top: 7px;
