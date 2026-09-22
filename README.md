@@ -73,3 +73,7 @@ The repository does not currently contain a full privacy policy. The form theref
 - Exercise the safe failure responses for missing configuration, Turnstile failure, rate limiting, and Brevo or network unavailability.
 - Check the form at desktop and mobile widths, including loading, field-error, general-error, success, retry, Back, keyboard focus, and reduced-motion behavior.
 - Inspect Cloudflare logs using a returned request ID and confirm that names, email addresses, Turnstile tokens, and API keys are never logged.
+
+## Search indexing
+
+`robots.txt` allows crawling and advertises `sitemap.xml`, which lists the canonical homepage. Section anchors are not separate pages. Search Console ownership, sitemap submission, and URL Inspection are managed separately in the Google account; deploying these files does not itself request indexing.
