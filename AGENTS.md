@@ -24,7 +24,7 @@ These instructions apply to the entire repository. The user's current request ta
 - Reuse existing visual patterns before inventing new ones. Cards in the same row must align and have equal outer heights.
 - Keep the event slider as a fixed, four-slide experience unless the user explicitly changes its information architecture. Wheel input and navigation dots move exactly one slide at a time.
 - Do not invent sponsors, partners, schedules, prices, application dates, or confirmed event details. By default mark unsettled information as provisional, “to be announced,” or “coming soon”. Ask user to input those fields, if he already has the required information. 
-- Do not state that information was sent, saved, subscribed, or confirmed unless a working integration proves it. The current join form and application button only show temporary status panels.
+- Do not state that information was sent, saved, subscribed, or confirmed unless a working integration proves it. The Join form uses the subscription endpoint; hackathon registration links to the confirmed Luma page documented in the design playbook.
 - Use `info@campuscompile.eu` for public contact email.
 - Write for students, developers, and technology enthusiasts across the region. Do not describe Campus Compile events as student-only unless the user explicitly narrows eligibility.
 
@@ -36,7 +36,7 @@ After changing `index.html`:
 2. Load the page in a browser; opening the file directly is not sufficient verification.
 3. Check the main navigation and the About, Events, Join, and footer sections.
 4. Open every event slide through its navigation dot and test one-step wheel navigation, the synchronized label, slide number, and progress line.
-5. Test the application and event-update status panels, including their Back buttons.
+5. Check both Luma registration links and the event-update status panels, including their Back buttons.
 6. Check representative desktop and narrow/mobile widths for clipping, overflow, broken grids, and unreadable text.
 7. Confirm that visible content fits each event slide and inspect the browser console for JavaScript errors.
 

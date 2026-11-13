@@ -125,8 +125,9 @@ New event blocks should reuse this four-slide structure unless the event genuine
 - Use four equal-height cards with aligned borders.
 - Keep descriptions concrete and short.
 - The application call to action sits below the cards.
-- Until registration is live, “Apply with your team” opens an “Applications open soon” panel with a Back button.
-- Once a Luma registration URL is confirmed, replace the temporary panel behavior with a real link and update this playbook.
+- “Apply with your team” links directly to the confirmed Luma registration page: `https://luma.com/zua2dwbk`.
+- A red “Register for hackathon” link stays fixed at the bottom right while visitors scroll; on mobile it spans the available width with safe-area spacing. Reserve space below the footer content so the link cannot cover the final contacts.
+- Registration links open Luma in a new tab and include a visible external-link arrow and an accessible label announcing the new tab.
 
 ## Current copy rules
 

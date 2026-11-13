@@ -44,6 +44,10 @@ The production site is deployed by [the GitHub Actions workflow](.github/workflo
 
 `wrangler.jsonc` is the source of truth for the non-secret Cloudflare Pages runtime configuration. Wrangler reads it during the GitHub Actions deployment to provide the public environment values used by the server function. Keep the encrypted `BREVO_API_KEY` and `TURNSTILE_SECRET_KEY` values in the Cloudflare Pages dashboard, and keep `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in GitHub Actions secrets. Pages configuration does not support the Workers `secrets` declaration or Rate Limiting binding, so neither belongs in this file.
 
+## Hackathon registration
+
+The Events section’s “Apply with your team” link and the fixed “Register for hackathon” link open the confirmed [Luma registration page](https://luma.com/zua2dwbk) in a new tab. Registration is handled by Luma; the website does not collect applications itself. The fixed link is available throughout the page and adapts to mobile safe areas.
+
 ## Newsletter integration
 
 The Join form posts JSON to the same-origin Cloudflare Pages Function at `/api/subscribe`. The Function validates and normalizes the request, verifies Turnstile, and creates or updates the Brevo contact with `updateEnabled: true`. Protect production traffic with a Cloudflare WAF rate-limiting rule matching `POST /api/subscribe`; the server also honors a `SUBSCRIBE_RATE_LIMITER` binding if the project is migrated to a runtime that supports it.
